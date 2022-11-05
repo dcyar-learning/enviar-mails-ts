@@ -6,11 +6,13 @@ document.addEventListener('DOMContentLoaded', function () {
     const datosFormulario = {
         email: '',
         asunto: '',
+        cc: '',
         mensaje: '',
     };
 
     const inputEmail = document.querySelector('#email') as HTMLInputElement;
     const inputAsunto = document.querySelector('#asunto') as HTMLInputElement;
+    const inputCc = document.querySelector('#cc') as HTMLInputElement;
     const inputMensaje = document.querySelector(
         '#mensaje'
     ) as HTMLTextAreaElement;
@@ -21,6 +23,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     inputEmail.addEventListener('input', debounce(validar, 500));
     inputAsunto.addEventListener('input', debounce(validar, 500));
+    inputCc.addEventListener('input', debounce(validar, 500));
     inputMensaje.addEventListener('input', debounce(validar, 500));
     formulario.addEventListener('submit', enviarFormulario);
 
@@ -33,13 +36,18 @@ document.addEventListener('DOMContentLoaded', function () {
     function validar(e: MouseEvent): void {
         const target = e.target as HTMLInputElement;
 
-        if (target.value.trim() === '') {
+        if (target.value.trim() === '' && target.name !== 'cc') {
             mostrarAlerta(target, `El campo ${target.name} es obligatorio.`);
             return;
         }
 
         if (target.name === 'email' && !validarEmail(target.value)) {
             mostrarAlerta(target, 'El email no es válido.');
+            return;
+        }
+
+        if (target.name === 'cc' && !validarEmail(target.value)) {
+            mostrarAlerta(target, 'El cc no es válido.');
             return;
         }
 
@@ -95,12 +103,16 @@ document.addEventListener('DOMContentLoaded', function () {
             '#formulario button[type="submit"]'
         ) as HTMLButtonElement;
 
-        if (!Object.values(datosFormulario).includes('')) {
+        const data = datosFormulario;
+        delete data['cc' as keyof typeof datosFormulario];
+
+        if (!Object.values(data).includes('')) {
             btnSubmit.classList.remove('opacity-50');
             btnSubmit.disabled = false;
 
             return;
         }
+
         btnSubmit.classList.add('opacity-50');
         btnSubmit.disabled = true;
     }
